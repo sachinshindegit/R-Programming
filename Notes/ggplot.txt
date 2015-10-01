@@ -1,0 +1,113 @@
+installing ggplot:
+tools -> install packages -> ggplot2 -> install
+
+to add a package into our session:
+on console, type -> library(packageName) -> library(ggplot2)
+Note: if you are getting error that some thing now found eg: ggplot not found then include it using the above command
+
+
+Note: before plotting any points, it is always good to put it in a data frame.
+
+Plotting a point using ggplot:
+x<-4
+y<-9
+df<-data.frame(x,y)
+ggplot()+geom_point(data=df,aes(x=x,y=y),size=5,color="blue")
+
+to plot: (2,6), (5,4), (1,9)
+x <- c(2,5,1)
+y <- c(6,4,9)
+df <- data.frame(x,y)
+ggplot()+geom_point(data=df,aes(x=x,y=y), size=5, color="blue")
+
+controlling the x and y axes:
+scale_x_continuous(limit=c(0,15)) + scale_y_continuous(limit=c(0,15))    #This will create x and y axes ranging from 0 to 15
+scale_x_continuous(limit=c(0,15)),seq(from=0, to=15, by=0.5) + scale_y_continuous(limit=c(0,15)),seq(from=0, to=15, by=0.5) # x and y axes with 0.5 diff
+
+Plotting a line using ggplot:
+Line from (1,3) to (8,10) and from (-2,13) to (7,-5)
+x<-c(1,8)
+y<-c(3,10)
+df <- data.frame(x,y)
+ggplot()+geom_line(data=df,aes(x=x,y=y))
+continue..
+using the same df
+df$x=c(-2,7)
+> df$y=c(13,-5)
+> ggplot()+geom_line(data=df,aes(x=x,y=y))
+
+To plot a line using equation: y=3x+1
+take any 2 points for x
+x<-(0,10)
+y<-3x+1
+df <- data.frame(x,y)
+ggplot()+geom_line(data=df,aes(x=x,y=y))
+
+Plotting a vertical plot: eg: on x=1, plot all y:
+
+x<-rep(1,100)   # create 100 1's
+y<-rnorm(100,50,10)   # 50 is the mean and 10 is the standard deviation and 100 is the number of numbers you wanna pick
+df<-data.frame(x,y)
+x<-1 
+y<-50
+mean<-data.frame(x,y)  # we have created a mean variable at point (1,50)
+ggplot()+geom_point(data=df,aes(x=x,y=y))+geom_point(data=mean,aes(x=x,y=y),size=10,color="red")
+
+Task: plot 3 distinct vertical samples of 100 points each
+sample 1: x=1, mean=50, sd=10
+sample 2: x=9, mean=30, sd=10
+sample 3: x=15, mean=78, sd=10
+soln:
+x<-rep(1,100)
+x<-c(x,rep(9,100))
+x<-c(x,rep(15,100))
+y<-rnorm(100,50,10)
+y<-c(y,rnorm(100,30,10))
+y<-c(y,rnorm(100,78,10))
+df<-data.frame(x,y)
+#Now plotting the means
+x<-c(1,9,15)
+y<-c(50,30,78)
+mean<-data.frame(x,y)
+ggplot()+
+  geom_point(data=df,aes(x=x,y=y))+
+  geom_point(data=mean,aes(x=x,y=y),size=7,color="red")
+  
+Task: Create four vertical samples of 100 points each. Means must lie on the line y=3x+1. x-locations:1,9,15,22
+soln:
+x<-c(0,25)
+y<-3*x+1
+l<-data.frame(x,y)
+x<-c(1,9,15,22)
+y<-3*x+1
+means<-data.frame(x,y)
+x<-c(rep(1,100),rep(9,100),rep(15,100),rep(22,100))
+y<-c(rnorm(100,means$y[1],10),rnorm(100,means$y[2],10),rnorm(100,means$y[3],10),rnorm(100,means$y[4],10))
+dat<-data.frame(x,y)
+ggplot()+
+  geom_line(data=l,aes(x=x,y=y))+
+  geom_point(data=means,aes(x=x,y=y),size=7,color="red")+
+  geom_point(data=dat,aes(x=x,y=y))
+  
+Task: Generate 100 data points in the following way: The x co-ordinates are drawn from a normal population of mean 10 and sd 5.
+For each value of x, 1 y value is drawn from normal population with mean 3x+1 and sd as 10
+Soln:
+x<-rnorm(100,10,5)
+y<-3*x+1
+means<-data.frame(x,y)
+To draw a line through these points
+x<-(-5,25)			# random points chosen
+y=3*x+1
+line=data.frame(x,y)
+Now for the final step of getting y
+x<-means$x
+We need mean of y to line on the line 3x+1
+hence we need rnorm(100,3*x+1,10), but we cannot execute this directly since in this mean value is a function i.e '3x+1'. Hence we use sapply
+y<-sapply(x,function(x) rnorm(1,3*x+1,10))    # Notice that its 1 instead of 100 in rnorm. sapply applies this on all the points of x
+dat<-data.frame(x,y)
+
+ggplot()+
+  geom_point(data=means,aes(x=x,y=y),color="red")+
+  geom_line(data=line,aes(x=x,y=y))+
+  geom_point(data=dat,aes(x=x,y=y))
+

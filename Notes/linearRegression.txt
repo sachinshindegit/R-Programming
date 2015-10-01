@@ -1,0 +1,174 @@
+Linear Regression
+Install package 'UsingR' and include that in the library
+
+Type father.son on console. It will show the contents of this data frame. The data set is about father's and son's heights
+
+Now try 
+ggplot()+
+  geom_point(data=father.son,aes(x=fheight,y=sheight))
+  
+Linear regression is all about finding the linear relation between two entities (here father and son height)
+Lets solve this: aim is to find the best fitting line for this plot, i.e the linear relation.
+1.
+first plot the points:
+ggplot()+
+  geom_point(data=father.son,aes(x=fheight,y=sheight))
+2.
+make a guess for the best fitting line. choose any 2 points with their x and y co-ordinates.
+x<-c(60,75)
+y<-c(63,78)
+line<-data.frame(x,y)
+ggplot()+
+  geom_point(data=father.son,aes(x=fheight,y=sheight))+
+  geom_line(data=line,aes(x=x,y=y))
+
+3.
+  Now lets find the equation for this line  
+  slope=(78-63)/(75-63) = 1
+  slope=(y-63)/(x-60)=1
+  hence y=x+3
+
+4. 	Residuals: residuals are the vertical lines drawn from all the data points to the best fitting line.
+	Drawing the residuals
+	x<-father.son$fheight		# storing father's height in x
+	y<-father.son$sheight		# storing son's height in y
+	group<-1:1078				# since there are 1078 records, we have taken group from 1 to 1078
+	dat<-data.frame(x,y,group)
+	x will remain the same
+	y will be such that the points (x,y) will lie on our line which we assumed to be the best fitting line
+	hence
+	y=x+3
+	means=data.frame(x,y,group)
+	ggplot()+
+		geom_point(data=father.son,aes(x=fheight,y=sheight))+
+		geom_line(data=line,aes(x=x,y=y))+
+		geom_point(data=means,aes(x=x,y=y),color="red")
+	Now we need to draw the residuals. i.e lines from the data point to the mean line. we use rbind (row bind) for this which is a type of data frame
+	we bind 'dat' and 'means' data frame together. means points are on our line and dat contains the data points
+	d=rbind(dat,means)    # condition is that the variable in the datasets that we are binding should have the same name
+	ggplot()+
+	  geom_point(data=father.son,aes(x=fheight,y=sheight))+
+	  geom_line(data=line,aes(x=x,y=y))+
+	  geom_point(data=means,aes(x=x,y=y),color="red")+
+	  geom_line(data=d,aes(x=x,y=y,group=group))     
+	  # group = group will group the members together which have the same label, i.e it will group	   those with group = 1 then 2 then 3 etc.
+	  
+5.  Now we need to figure out how well this line fits.
+	for this we will do sum of the square of the residuals. This is called the residual sum of squares
+	The best fitting line would have this sum as minimum
+	Here we will find the distance between the black and corresponding red point
+	We need to find the equation of the best fitting line.
+	For this we will use a built in function in R (liner modal method)
+	
+	lm(y~x,data=dat)     # 'dat' is the data set holding the actual data points
+	o/p:
+	Call:
+		lm(formula = y ~ x, data = dat)
+
+		Coefficients:
+		(Intercept)            x  
+			33.8866       0.5141  
+	
+	We store the slope and the intercept
+	intercept = 33.8866
+	slope = 0.5141
+	Now choose 2 x co-ordinates for drawing the line
+	x<-c(57,78)
+	y<-slope*x+intercept
+	line<-data.frame(x,y)
+	
+	ggplot()+
+	  geom_point(data=father.son,aes(x=fheight,y=sheight))+
+	  geom_line(data=line,aes(x=x,y=y))+
+	  geom_point(data=means,aes(x=x,y=y),color="red")+
+	  geom_line(data=d,aes(x=x,y=y,group=group))+
+	  geom_line(data=line,aes(x=x,y=y))
+	  
+	Now plot the new means
+	x<-means$x
+	y<-slope*x+intercept
+	means<-data.frame(x,y,group)
+	
+	ggplot()+
+	  geom_point(data=father.son,aes(x=fheight,y=sheight))+
+	  geom_line(data=line,aes(x=x,y=y))+
+	  geom_point(data=means,aes(x=x,y=y),color="red")+
+	  geom_line(data=d,aes(x=x,y=y,group=group))+
+	  geom_line(data=line,aes(x=x,y=y))
+
+		Now you can see the red points are shifted to the new line
+	Now lets move the residuals to the new line
+	d<-rbind(dat,means)
+	
+	ggplot()+
+	  geom_point(data=father.son,aes(x=fheight,y=sheight))+
+	  geom_line(data=line,aes(x=x,y=y))+
+	  geom_point(data=means,aes(x=x,y=y),color="red")+
+	  geom_line(data=d,aes(x=x,y=y,group=group))+
+	  geom_line(data=line,aes(x=x,y=y))
+	  
+	This is the best fitting line
+	
+	
+	Prediction:
+	given any value of fathers height i.e we can predict sons height using the equation of the line which we just deduced above
+	using usual y=mx+c
+
+
+
+y=0.5141x+33.8866
+
+
+
+
+Simple steps for linear regression:
+1. plot the data points
+	ggplot()+
+	  geom_point(data=father.son,aes(x=fheight,y=sheight)) 
+
+2. Draw the best fitting line:
+	  
+	x<-father.son$fheight
+	y<-father.son$sheight
+	group<-1:1078		# since there are 1078 records
+
+	dat<-data.frame(x,y,group)
+	To get the slope and intercept of the best fitting line:
+	lm(y~x,data=dat)
+	o/p:
+	Call:
+		lm(formula = y ~ x, data = dat)
+
+		Coefficients:
+		(Intercept)            x  
+			33.8866       0.5141 
+	
+		Hence the equation of the best fitting line will be y<-0.5141*x+33.8866
+	choose x co-ordinates for any 2 points as starting and ending points for the line:
+		x<-c(60,75)
+		y<-0.5141*x+33.8866
+		line<-data.frame(x,y,group)
+		
+		ggplot()+
+		geom_point(data=father.son,aes(x=fheight,y=sheight))+
+		geom_line(data=line,aes(x=x,y=y))
+		This will display the best fitting line.
+		
+3. To draw the residuals:
+			x<-father.son$fheight
+			y<-0.5141*x+33.8866
+			means<-data.frame(x,y,group)
+			d<-rbind(dat,means)
+
+			ggplot()+
+			  geom_point(data=father.son,aes(x=fheight,y=sheight))+
+			  geom_line(data=line,aes(x=x,y=y))+
+			  geom_point(data=means,aes(x=x,y=y),color="red")+
+			  geom_line(data=d,aes(x=x,y=y,group=group))
+			  
+			  
+		For prediction, substitute x or y value in the derived equation. Here y<-0.5141*x+33.8866
+
+Finish
+======================================================================			  
+			
